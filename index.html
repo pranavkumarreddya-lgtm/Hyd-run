@@ -26,8 +26,11 @@ let obstacle = document.getElementById("obstacle");
 
 let obstacleTop = -40;
 let jumping = false;
+let gameOver = false;
 
 function gameLoop(){
+
+  if(gameOver) return;
 
   obstacleTop += 4;
   obstacle.style.top = obstacleTop + "px";
@@ -36,7 +39,6 @@ function gameLoop(){
     obstacleTop = -40;
   }
 
-  // REAL collision detection
   let playerRect = player.getBoundingClientRect();
   let obstacleRect = obstacle.getBoundingClientRect();
 
@@ -46,8 +48,10 @@ function gameLoop(){
     playerRect.top < obstacleRect.bottom &&
     playerRect.bottom > obstacleRect.top
   ) {
+    gameOver = true;
     alert("Game Over 😭");
-    obstacleTop = -40;
+    location.reload(); // clean restart
+    return;
   }
 
   requestAnimationFrame(gameLoop);
@@ -57,7 +61,7 @@ gameLoop();
 
 
 function jump(){
-  if(jumping) return;
+  if(jumping || gameOver) return;
 
   jumping = true;
   let position = 10;
