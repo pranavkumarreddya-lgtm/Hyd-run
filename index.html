@@ -27,38 +27,58 @@ let obstacle = document.getElementById("obstacle");
 let obstacleTop = -40;
 let jumping = false;
 
-setInterval(function(){
+function gameLoop(){
 
-  obstacleTop += 5;
+  obstacleTop += 4;
   obstacle.style.top = obstacleTop + "px";
 
   if(obstacleTop > 400){
     obstacleTop = -40;
   }
 
-  let playerBottom = parseInt(player.style.bottom);
+  // REAL collision detection
+  let playerRect = player.getBoundingClientRect();
+  let obstacleRect = obstacle.getBoundingClientRect();
 
-  // COLLISION ONLY WHEN OBSTACLE AT PLAYER HEIGHT
-  if(obstacleTop > 300 && obstacleTop < 340){
-    if(playerBottom < 80){
-      alert("Game Over 😭");
-      obstacleTop = -40;
-    }
+  if (
+    playerRect.left < obstacleRect.right &&
+    playerRect.right > obstacleRect.left &&
+    playerRect.top < obstacleRect.bottom &&
+    playerRect.bottom > obstacleRect.top
+  ) {
+    alert("Game Over 😭");
+    obstacleTop = -40;
   }
 
-}, 40);
+  requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
 
 
 function jump(){
   if(jumping) return;
 
   jumping = true;
-  player.style.bottom = "150px";
+  let position = 10;
 
-  setTimeout(function(){
-    player.style.bottom = "10px";
-    jumping = false;
-  }, 500);
+  let up = setInterval(function(){
+    if(position >= 150){
+      clearInterval(up);
+
+      let down = setInterval(function(){
+        if(position <= 10){
+          clearInterval(down);
+          jumping = false;
+        }
+        position -= 5;
+        player.style.bottom = position + "px";
+      }, 20);
+
+    }
+    position += 5;
+    player.style.bottom = position + "px";
+  }, 20);
 }
 
 document.addEventListener("click", jump);
